@@ -6,11 +6,13 @@ import bcrypt from 'bcrypt'
 class ProductController {
     async createProductHandler(req: Request, res: Response) {
         try {
-            const userExist = await userService.findUserById(req.body.owner)
+            const userExist = await userService.findUserById(res.locals.user.user_id)
             if (userExist == null) {
                 return res.status(409).send("User does not exist")
             }
-            const product = await productService.createProduct(req.body)
+
+            const reqProduct = {owner: userExist._id,...req.body}
+            const product = await productService.createProduct(reqProduct)
             return res.send(product)
         }
         catch (e: any) {
@@ -24,12 +26,18 @@ class ProductController {
             if (productExist == null) {
                 return res.status(409).send("Product does not exist")
             }
-            const userExist = await userService.findUserById(req.body.owner)
+
+            const userExist = await userService.findUserById(res.locals.user.user_id)
             if (userExist == null) {
                 return res.status(409).send("User does not exist")
             }
 
-            const product = await productService.updateProduct(req.params.id, req.body)
+            if(productExist.owner !== userExist.id){
+                return res.status(409).send("You dont have access to this product")
+            }
+
+            const reqProduct = {owner: userExist._id,...req.body}
+            const product = await productService.updateProduct(req.params.id, reqProduct)
             return res.send(product)
         }
         catch (e: any) {
@@ -43,6 +51,16 @@ class ProductController {
             if (product == null) {
                 return res.status(409).send("Product does not exist")
             }
+
+            const userExist = await userService.findUserById(res.locals.user.user_id)
+            if (userExist == null) {
+                return res.status(409).send("User does not exist")
+            }
+
+            if(product.owner !== userExist.id){
+                return res.status(409).send("You dont have access to this product")
+            }
+
             return res.send(product)
         }
         catch (e: any) {
@@ -52,7 +70,11 @@ class ProductController {
 
     async getProducts(req: Request, res: Response) {
         try {
-            const products = await productService.findProducts()
+            const userExist = await userService.findUserById(res.locals.user.user_id)
+            if (userExist == null) {
+                return res.status(409).send("User does not exist")
+            }
+            const products = await productService.findProductsFromUser(userExist._id)
             return res.send(products)
         }
         catch (e: any) {
@@ -66,6 +88,16 @@ class ProductController {
             if (productExist == null) {
                 return res.status(409).send("Product does not exist")
             }
+
+            const userExist = await userService.findUserById(res.locals.user.user_id)
+            if (userExist == null) {
+                return res.status(409).send("User does not exist")
+            }
+
+            if(productExist.owner !== userExist.id){
+                return res.status(409).send("You dont have access to this product")
+            }
+            
             const product = await productService.deleteProduct(req.params.id)
             return res.send(product)
         }

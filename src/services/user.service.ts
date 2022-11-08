@@ -43,6 +43,16 @@ class UserService {
         }
     }
 
+    async findUserByUsername(username: string) {
+        try {
+            const user = await UserModel.findOne({ username })
+            return user
+        }
+        catch (e: any) {
+            throw new Error(e)
+        }
+    }
+
     async findUsers() {
         try{
             const users = await UserModel.find({})

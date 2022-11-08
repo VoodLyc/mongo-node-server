@@ -4,6 +4,10 @@ import bcrypt from 'bcrypt'
 import jwt, { Secret } from 'jsonwebtoken'
 import { UserDocument } from '../models/user.model'
 
+interface UserHidePassword extends Omit<UserDocument, 'password'>{
+    password: string | undefined
+}
+
 class UserController {
     async createUserHandler(req: Request, res: Response) {
         try {
@@ -41,11 +45,12 @@ class UserController {
     async getUser(req: Request, res: Response) {
         try {
             const userExist = await userService.findUserById(req.params.id)
-            if (userExist == null) {
+            if (!userExist) {
                 return res.status(409).send("User does not exist")
             }
-            userExist.password = ""
-            return res.send(userExist)
+            const user: UserHidePassword = userExist
+            user.password = undefined
+            return res.send(user)
         } catch (e: any) {
             return res.status(409).send(e.message)
         }
@@ -54,6 +59,11 @@ class UserController {
     async getUsers(req: Request, res: Response) {
         try {
             const users = await userService.findUsers()
+            const userWithoutPassword = users.map((user)=> {
+                let userNew: UserHidePassword = user
+                userNew.password = undefined
+                return user
+            })
             return res.send(users)
         } catch (e: any) {
             return res.status(409).send(e.message)
@@ -63,8 +73,8 @@ class UserController {
     async deleteUser(req: Request, res: Response) {
         try {
             const userExist = await userService.findUserById(req.params.id)
-            if (userExist == null) {
-                return res.status(409).send("User does not exist")
+            if (!userExist) {
+                return res.status(409).send("user does not exist")
             }
             const user = await userService.deleteUser(req.params.id)
             return res.send(user)
@@ -74,7 +84,29 @@ class UserController {
     }
 
     async login(req: Request, res: Response) {
-        //TODO
+        try {
+            const user: UserDocument | null = await userService.findUserByUsername(req.body.username);
+            if (
+                user !== null &&
+                (await bcrypt.compare(req.body.password, user.password))
+            ) {
+                const expiresIn = 7200
+
+                const token = jwt.sign(
+                    { user_id: user._id, email: user.email },
+                    process.env.TOKEN_SECRET as Secret,
+                    { expiresIn }
+                );
+
+                return res
+                    .status(200)
+                    .send({ email: user.email, name: user.name, token, expiresIn });
+            }
+
+            return res.status(401).send("Invalid credentials");
+        } catch (e: any) {
+            return res.status(409).send(e.message);
+        }
     }
 }
 

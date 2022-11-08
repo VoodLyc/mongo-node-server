@@ -13,7 +13,7 @@ class ProductService {
 
     async updateProduct(id: string, input: ProductInput) {
         try {
-            const product = await ProductModel.findOneAndUpdate({ _id: id }, input, {
+            const product = await ProductModel.findOneAndUpdate({ _id: id}, input, {
                 new: true
             })
             return product?.toJSON()
@@ -36,6 +36,16 @@ class ProductService {
     async findProducts() {
         try {
             const products = await ProductModel.find({})
+            return products
+        }
+        catch (e: any) {
+            throw new Error(e)
+        }
+    }
+
+    async findProductsFromUser(ownerId: string) {
+        try {
+            const products = await ProductModel.find({owner: ownerId})
             return products
         }
         catch (e: any) {

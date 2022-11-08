@@ -12,8 +12,5 @@ export const createProductSchema = object({
     }).min(0, "Negative values are not allowed"),
     brand: string({
         required_error: "Password is required",
-    }),
-    owner: string({
-        required_error: "Owner is required"
     })
 })
