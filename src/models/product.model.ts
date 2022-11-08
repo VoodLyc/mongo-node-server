@@ -18,12 +18,11 @@ const productSchema = new mongoose.Schema({
     description: { type: String, required: true },
     quantity: { type: Number, required: true },
     brand: { type: String, required: true },
-    owner: { type: Boolean },
-
+    owner: { type: String, required: true }
 }, {
     timestamps: true
 })
 
-const ProductModel = mongoose.model<ProductDocument> ("Product", productSchema)
+const ProductModel = mongoose.model<ProductDocument>("Product", productSchema)
 
 export default ProductModel

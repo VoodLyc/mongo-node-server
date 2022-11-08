@@ -9,7 +9,7 @@ class UserController {
         try {
             const userExist = await userService.findUserByEmail(req.body.email)
             if (userExist !== null) {
-                return res.status(409).send("user exist")
+                return res.status(409).send("User already exists")
             }
 
             req.body.password = await bcrypt.hash(req.body.password, 10)
@@ -24,7 +24,7 @@ class UserController {
         try {
             const userExist = await userService.findUserById(req.params.id)
             if (userExist == null) {
-                return res.status(409).send("user not exist");
+                return res.status(409).send("User does not exist");
             }
 
             if (req.body.password) {
@@ -42,7 +42,7 @@ class UserController {
         try {
             const userExist = await userService.findUserById(req.params.id)
             if (userExist == null) {
-                return res.status(409).send("user not exist")
+                return res.status(409).send("User does not exist")
             }
             userExist.password = ""
             return res.send(userExist)
@@ -64,9 +64,9 @@ class UserController {
         try {
             const userExist = await userService.findUserById(req.params.id)
             if (userExist == null) {
-                return res.status(409).send("user not exist")
+                return res.status(409).send("User does not exist")
             }
-            let user = await userService.deleteUser(req.params.id)
+            const user = await userService.deleteUser(req.params.id)
             return res.send(user)
         } catch (e: any) {
             return res.status(409).send(e.message)

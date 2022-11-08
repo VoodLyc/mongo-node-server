@@ -53,9 +53,9 @@ class UserService {
         }
     }
 
-    async deleteUser(email: string) {
+    async deleteUser(id: string) {
         try {
-            const user = await UserModel.deleteOne({ email: email })
+            const user = await UserModel.deleteOne({ _id: id })
             return user
         } catch (e: any) {
             throw new Error(e)
