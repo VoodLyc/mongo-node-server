@@ -6,8 +6,8 @@ export const createUserSchema = object({
     }),
     email: string({
         required_error: "Email is required",
-    }).email("Not a valid email address"),
-    userName: string({
+    }),
+    username: string({
         required_error: "Username is required"
     }).min(8, "Password too short").max(16, "Password too long"),
     password: string({

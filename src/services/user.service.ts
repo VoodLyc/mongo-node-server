@@ -23,6 +23,16 @@ class UserService {
         }
     }
 
+    async findUserById (id: string) {
+        try {
+            const user = await UserModel.findOne({ _id: id })
+            return user
+        }
+        catch (e: any) {
+            throw new Error(e)
+        }
+    }
+
     async findUserByEmail(email: string) {
         try {
             const user = await UserModel.findOne({ email: email })
@@ -42,3 +52,5 @@ class UserService {
         }
     }
 }
+
+export default new UserService()
