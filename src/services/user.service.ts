@@ -43,6 +43,16 @@ class UserService {
         }
     }
 
+    async findUsers() {
+        try{
+            const users = await UserModel.find({})
+            return users
+        }
+        catch (e: any) {
+            throw new Error(e)
+        }
+    }
+
     async deleteUser(email: string) {
         try {
             const user = await UserModel.deleteOne({ email: email })

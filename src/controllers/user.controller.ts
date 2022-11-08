@@ -51,6 +51,15 @@ class UserController {
         }
     }
 
+    async getUsers(req: Request, res: Response) {
+        try {
+            const users = await userService.findUsers()
+            return res.send(users)
+        } catch (e: any) {
+            return res.status(409).send(e.message)
+        }
+    }
+
     async deleteUser(req: Request, res: Response) {
         try {
             const userExist = await userService.findUserById(req.params.id)
